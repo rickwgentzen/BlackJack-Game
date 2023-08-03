@@ -1,0 +1,99 @@
+import java.util.Scanner;
+import java.util.Random;
+
+public class Main {
+    private static final Scanner keyboard = new Scanner(System.in);
+    private static final int MAX_SCORE = 21;
+    private static final int MAX_CARD_VALUE = 11;
+
+    public static void main(String[] args) {
+        int userWins = 0;
+        int computerWins = 0;
+        String userReply;
+
+        do {
+            String outcome = playBlackJack();
+            System.out.println(outcome);
+            if (outcome.equals(GameOutcome.USER_WON)) {
+                userWins++;
+            } else if (outcome.equals(GameOutcome.COMPUTER_WON)) {
+                computerWins++;
+            }
+
+            System.out.println("Do you want to play again? (yes/no)");
+            userReply = keyboard.nextLine().toUpperCase();
+        } while (userReply.charAt(0) == 'Y');
+
+        System.out.println("You won " + userWins + " times.");
+        System.out.println("The computer won " + computerWins + " times.");
+        if (userWins > computerWins) {
+            System.out.println("You have beaten the computer, good job!");
+        } else if (computerWins > userWins) {
+            System.out.println("The computer won, better luck next time!");
+        } else {
+            System.out.println("You tied with the computer!");
+        }
+        System.out.println("Goodbye! Please play again!");
+    }
+
+    public static String playBlackJack() {
+        Random myRan = new Random();
+        int userScore = 0;
+        int computerScore = 0;
+
+        do {
+            int userCard = myRan.nextInt(MAX_CARD_VALUE) + 1;
+            System.out.println("You drew a " + userCard);
+            userScore += userCard;
+            System.out.println("Your card value: " + userScore);
+
+            int computerCard = myRan.nextInt(MAX_CARD_VALUE) + 1;
+            computerScore += computerCard;
+            System.out.println("The computer drew a " + computerCard);
+            System.out.println("Computer card value: " + computerScore);
+
+            if (userScore >= MAX_SCORE || computerScore >= MAX_SCORE) {
+                break;
+            }
+
+            System.out.println("Draw another card? (yes/no)");
+        } while (getYesNoInput());
+
+        return determineOutcome(userScore, computerScore);
+    }
+
+    private static boolean getYesNoInput() {
+        String userInput;
+        do {
+            userInput = keyboard.next().toLowerCase();
+        } while (!userInput.equals("yes") && !userInput.equals("no"));
+
+        // Consume the newline character
+        keyboard.nextLine();
+
+        return userInput.equals("yes");
+    }
+
+    private static String determineOutcome(int userScore, int computerScore) {
+        if (userScore > MAX_SCORE && computerScore > MAX_SCORE) {
+            return GameOutcome.BOTH_LOST;
+        } else if (userScore > MAX_SCORE) {
+            return GameOutcome.COMPUTER_WON;
+        } else if (computerScore > MAX_SCORE) {
+            return GameOutcome.USER_WON;
+        } else if (userScore == computerScore) {
+            return GameOutcome.TIE;
+        } else if (userScore > computerScore) {
+            return GameOutcome.USER_WON;
+        } else {
+            return GameOutcome.COMPUTER_WON;
+        }
+    }
+
+    private static class GameOutcome {
+        public static final String USER_WON = "You won";
+        public static final String COMPUTER_WON = "The computer won";
+        public static final String BOTH_LOST = "Both lost";
+        public static final String TIE = "It's a tie";
+    }
+}
